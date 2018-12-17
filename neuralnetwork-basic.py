@@ -51,17 +51,20 @@ class neural_network:
         self.layers[0].activations = inputs
         for i in range(self.num_layers - 1):
             temp = np.matmul(self.layers[i].activations, self.layers[i].weights_for_layer)
-            if self.layers[i+1].activation_function == "sigmoid":
-                self.layers[i+1].activations = self.sigmoid(temp)
-            elif self.layers[i+1].activation_function == "softmax":
-                self.layers[i+1].activations = self.softmax(temp)
-            elif self.layers[i+1].activation_function == "relu":
-                self.layers[i+1].activations = self.relu(temp)
-            elif self.layers[i+1].activation_function == "tanh":
-                self.layers[i+1].activations = self.tanh(temp)
+            act_func = self.layers[i+1].activation_function
+            actvs = self.layers[i+1].activations
+            if act_func == "sigmoid":
+                actvs = self.sigmoid(temp)
+            elif act_func == "softmax":
+                actvs = self.softmax(temp)
+            elif act_func == "relu":
+                actvs = self.relu(temp)
+            elif act_func == "tanh":
+                actvs = self.tanh(temp)
             else:
-                self.layers[i+1].activations = temp
+                actvs = temp
     
+    # sigmoide activation function is 'old-fashioned'
     def sigmoid(self, layer):
         return np.divide(1, np.add(1, np.exp(layer)))
 
@@ -72,6 +75,7 @@ class neural_network:
         else:
             return exp/np.sum(exp, keepdims=True)
     
+    # rectified linear unit
     def relu(self, layer):
         layer[layer < 0] = 0
         return layer
@@ -108,13 +112,14 @@ class neural_network:
         # if self.cost_function == "cross_entropy" and self.layers[self.num_layers-1].activation_function == "softmax":
         targets = labels
         i = self.num_layers-1
-        y = self.layers[i].activations
-        deltaw = np.matmul(np.asarray(self.layers[i-1].activations).T, np.multiply(y, np.multiply(1-y, targets-y)))
+        actvs = self.layers[i].activations
+        deltaw = np.matmul(np.asarray(self.layers[i-1].activations).T, np.multiply(actvs, np.multiply(1-actvs, targets-actvs)))
         new_weights = self.layers[i-1].weights_for_layer - self.learning_rate * deltaw
         for i in range(i-1, 0, -1):
-            y = self.layers[i].activations
-            deltaw = np.matmul(np.asarray(self.layers[i-1].activations).T, np.multiply(y, np.multiply(1-y, np.sum(np.multiply(new_weights, self.layers[i].weights_for_layer),axis=1).T)))
-            self.layers[i].weights_for_layer = new_weights
+            actvs = self.layers[i].activations
+            weights = self.layers[i].weights_for_layer
+            deltaw = np.matmul(np.asarray(self.layers[i-1].activations).T, np.multiply(actvs, np.multiply(1-actvs, np.sum(np.multiply(new_weights, weights),axis=1).T)))
+            weights = new_weights
             new_weights = self.layers[i-1].weights_for_layer - self.learning_rate * deltaw
         self.layers[0].weights_for_layer = new_weights
 
@@ -122,7 +127,7 @@ class neural_network:
         dill.load_session(filename)
         self.batch_size = 1
         self.forward_pass(input)
-        a  =self.layers[self.num_layers-1].activations
+        a = self.layers[self.num_layers-1].activations
         a[np.where(a==np.max(a))] = 1
         a[np.where(a!=np.max(a))] = 0
         return a
