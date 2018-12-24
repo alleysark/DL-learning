@@ -17,3 +17,6 @@ In real world, the model we've designed will be used for data we do not know at 
 
 ### Validation set
 What is the correct way of tuning the hyperparameters without touching the test set? The ideal answer is to split our training set in two: a slightly smaller training set, and what we call a **validation set**.
+
+### Cross-validation
+Picking validation set by sequencial (or random) way could have noise. Instead of this, what we called **cross-validation** is, we would split the training data into n equal folds, use (n-1) of them for training, and 1 for validation. We would then iterate over which fold is the validation fold. This would be referred to as n-fold cross-validation.
