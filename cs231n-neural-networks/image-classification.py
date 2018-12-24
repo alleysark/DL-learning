@@ -5,8 +5,13 @@ from cs231n import data_utils
 import numpy as np
 
 class NearestNeighbor(object):
-    def __init__(self):
-        pass
+    def __init__(self, dist = 'L1'):
+        if dist == 'L1':
+            self.dist = self.L1_distance
+        elif dist == 'L2':
+            self.dist = self.L2_distance
+        else:
+            raise Warning("invalid distance function name!")
     
     def train(self, X, y):
         # X is N x D where each row is an example. Y is 1d lables of size N
@@ -28,15 +33,41 @@ class NearestNeighbor(object):
             print("now predict... (%.3f)" % (float(i) / num_test))
             distances = []
             for Xtr_row in self.Xtr:
-                ''' L1 distance '''
-                #distances.append(np.sum(np.abs(Xtr_row - X[i, :])))
-
-                ''' L2 distance '''
-                distances.append(np.sqrt(np.sum(np.square(Xtr_row - X[i, :]))))
+                distances.append( self.dist(Xtr_row, X[i, :]) )
             min_idx = np.argmin(distances) # get the index with smallest distance
             Ypred[i] = self.ytr[min_idx]
         
         return Ypred
+    
+    def L1_distance(self, Xtr, Xte):
+        return np.sum(np.abs(Xtr - Xte))
+
+    def L2_distance(self, Xtr, Xte):
+        return np.sqrt(np.sum(np.square(Xtr - Xte)))
+
+
+def classify_images_simple(Xtr, Ytr, Xte, Yte):
+    nn = NearestNeighbor()
+    nn.train(Xtr, Ytr)
+    Yte_predict = nn.predict(Xte)
+
+    print('accuracy: %f' % (np.mean(Yte_predict == Yte)))
+
+def classify_images_with_validation_set(Xtr, Ytr, val_len):
+    Xval = Xtr[:val_len, :] # take first `val_len` for validation
+    Yval = Ytr[:val_len]
+    Xtr = Xtr[val_len:, :] # keep others for training
+    Ytr = Ytr[val_len:]
+
+    validation_accuracies = []
+    for dist_func in ['L1', 'L2']:
+        nn = NearestNeighbor(dist=dist_func)
+        nn.train(Xtr, Ytr)
+        Yval_predict = nn.predict(Xval)
+        acc = np.mean(Yval_predict == Yval)
+        print('accuracy: %f' % (acc))
+
+        validation_accuracies.append((dist_func, acc))
 
 
 # It is too large to load data into local memory. I'll use simplified version instead.
@@ -45,8 +76,6 @@ Xtr, Ytr, Xte, Yte = data_utils.load_CIFAR10_noreshape('../cs231n/datasets/cifar
 #Xtr = Xtr.reshape(Xtr.shape[0], 32 * 32 * 3)
 #Xte = Xte.reshape(Xte.shape[0], 32 * 32 * 3)
 
-nn = NearestNeighbor()
-nn.train(Xtr, Ytr)
-Yte_predict = nn.predict(Xte)
+classify_images_simple(Xtr, Ytr, Xte, Yte)
 
-print('accuracy: %f' % (np.mean(Yte_predict == Yte)))
+classify_images_with_validation_set(Xtr, Ytr, val_len=1000)
