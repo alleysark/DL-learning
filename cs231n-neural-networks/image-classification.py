@@ -28,14 +28,22 @@ class NearestNeighbor(object):
             print("now predict... (%.3f)" % (float(i) / num_test))
             distances = []
             for Xtr_row in self.Xtr:
-                distances.append(np.sum(np.abs(Xtr_row - X[i, :])))
+                ''' L1 distance '''
+                #distances.append(np.sum(np.abs(Xtr_row - X[i, :])))
+
+                ''' L2 distance '''
+                distances.append(np.sqrt(np.sum(np.square(Xtr_row - X[i, :]))))
             min_idx = np.argmin(distances) # get the index with smallest distance
             Ypred[i] = self.ytr[min_idx]
         
         return Ypred
 
 
-Xtr, Ytr, Xte, Yte = data_utils.load_CIFAR10_noreshape('../cs231n/datasets/cifar-10-batches-py/') # a magic function we provide
+# It is too large to load data into local memory. I'll use simplified version instead.
+Xtr, Ytr, Xte, Yte = data_utils.load_CIFAR10_noreshape('../cs231n/datasets/cifar-10-batches-py/')
+#Xtr, Ytr, Xte, Yte = data_utils.load_CIFAR10('../cs231n/datasets/cifar-10-batches-py/')
+#Xtr = Xtr.reshape(Xtr.shape[0], 32 * 32 * 3)
+#Xte = Xte.reshape(Xte.shape[0], 32 * 32 * 3)
 
 nn = NearestNeighbor()
 nn.train(Xtr, Ytr)
