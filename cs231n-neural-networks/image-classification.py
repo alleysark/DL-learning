@@ -70,11 +70,9 @@ def classify_images_with_validation_set(Xtr, Ytr, val_len):
         validation_accuracies.append((dist_func, acc))
 
 
-# It is too large to load data into local memory. I'll use simplified version instead.
-Xtr, Ytr, Xte, Yte = data_utils.load_CIFAR10_noreshape('../cs231n/datasets/cifar-10-batches-py/')
-#Xtr, Ytr, Xte, Yte = data_utils.load_CIFAR10('../cs231n/datasets/cifar-10-batches-py/')
-#Xtr = Xtr.reshape(Xtr.shape[0], 32 * 32 * 3)
-#Xte = Xte.reshape(Xte.shape[0], 32 * 32 * 3)
+Xtr, Ytr, Xte, Yte = data_utils.load_CIFAR10('../cs231n/datasets/cifar-10-batches-py/')
+Xtr = Xtr.reshape(Xtr.shape[0], 32 * 32 * 3)
+Xte = Xte.reshape(Xte.shape[0], 32 * 32 * 3)
 
 classify_images_simple(Xtr, Ytr, Xte, Yte)
 

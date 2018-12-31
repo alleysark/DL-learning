@@ -14,14 +14,6 @@ def load_pickle(f):
         return  pickle.load(f, encoding='latin1')
     raise ValueError("invalid python version: {}".format(version))
 
-def load_CIFAR10_batch_noreshape(filename):
-  with open(filename, 'rb') as f:
-    datadict = load_pickle(f)
-    X = datadict['data'].astype("float32")
-    Y = datadict['labels']
-    Y = np.array(Y)
-    return X, Y
-    
 def load_CIFAR_batch(filename):
   """ load single batch of cifar """
   with open(filename, 'rb') as f:
@@ -45,21 +37,6 @@ def load_CIFAR10(ROOT):
   Ytr = np.concatenate(ys)
   del X, Y
   Xte, Yte = load_CIFAR_batch(os.path.join(ROOT, 'test_batch'))
-  return Xtr, Ytr, Xte, Yte
-
-def load_CIFAR10_noreshape(ROOT):
-  """ load all of cifar """
-  xs = []
-  ys = []
-  for b in range(1,2):
-    f = os.path.join(ROOT, 'data_batch_%d' % (b, ))
-    X, Y = load_CIFAR10_batch_noreshape(f)
-    xs.append(X)
-    ys.append(Y)
-  Xtr = np.concatenate(xs)
-  Ytr = np.concatenate(ys)
-  del X, Y
-  Xte, Yte = load_CIFAR10_batch_noreshape(os.path.join(ROOT, 'test_batch'))
   return Xtr, Ytr, Xte, Yte
 
 def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000,
