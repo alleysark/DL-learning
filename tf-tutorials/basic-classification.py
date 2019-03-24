@@ -7,6 +7,7 @@ from tensorflow import keras
 # import helper libraries
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 
 # import fashion data from keras dataset
 '''
@@ -29,7 +30,7 @@ def plot_images(imgs, num_shows):
         plt.xticks([])
         plt.yticks([])
         plt.grid(False)
-        plt.imshow(imgs[i], cmap=plt.cm.binary)
+        plt.imshow(imgs[i], cmap=cm.get_cmap('binary'))
         plt.xlabel(class_names[train_labels[i]])
     plt.show()
 
@@ -83,7 +84,7 @@ def plot_image(i, predictions_array, true_label, img):
     plt.grid(False)
     plt.xticks([])
     plt.yticks([])
-    plt.imshow(img, cmap=plt.cm.binary)
+    plt.imshow(img, cmap=cm.get_cmap('binary'))
 
     predicted_label = np.argmax(predictions_array)
     if predicted_label == true_label:
